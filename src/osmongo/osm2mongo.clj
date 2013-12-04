@@ -68,7 +68,7 @@
 		    <tag k=\"name\" v=\"Clipstone Street\"/>
 		    <tag k=\"oneway\" v=\"yes\"/>
     </way>"
-  #_(let [attrs (:attrs node)
+  (let [attrs (:attrs node)
          common (common-attrs attrs)
          visible (to-boolean (:visible attrs))
          values (map treat-node (:content node))
@@ -112,7 +112,7 @@
      <tag k=\"highway\" v=\"traffic_signals\"/>
    </node>
    ```"
-  #_(let [attrs (:attrs node)
+  (let [attrs (:attrs node)
          common (common-attrs attrs)
          lat (:lat attrs)
          lon (:lon attrs)
