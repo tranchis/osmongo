@@ -14,7 +14,7 @@
     (java.lang.Boolean/parseBoolean st)))
 
 (defn common-attrs [attrs]
-  {:id (to-long (:id attrs))
+  {:_id (to-long (:id attrs))
    :version (to-long (:version attrs))
    :timestamp (:timestamp attrs)
    :uid (to-long (:uid attrs))
