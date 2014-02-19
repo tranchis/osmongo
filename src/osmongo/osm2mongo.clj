@@ -1,7 +1,8 @@
 (ns osmongo.osm2mongo
   (:require [clojure.data.xml :as xml]
             [clojure.java.io :as io]
-            [somnium.congomongo :as m]))
+            [somnium.congomongo :as m])
+  (:gen-class))
 
 (defn to-long [st]
   (if (or (nil? st) (empty? st))
@@ -134,4 +135,5 @@
           elems (:content contents)]
       (dorun (map treat-node elems)))))
 
-
+(defn -main [& args]
+  (apply osm-to-mongo args))

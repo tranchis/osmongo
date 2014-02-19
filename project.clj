@@ -8,4 +8,6 @@
                  [org.clojure/data.xml "0.0.7"]]
   :plugins [[no-man-is-an-island/lein-eclipse "2.0.0"]
             [lein-marginalia "0.7.1"]]
+  :main osmongo.osm2mongo
+  :aot [osmongo.osm2mongo]
   :profiles {:dev {:dependencies [[ring-mock "0.1.5"]]}})
