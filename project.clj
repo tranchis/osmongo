@@ -5,6 +5,7 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [clj-time "0.6.0"]
                  [congomongo "0.4.1"]
+                 [com.github.tranchis/clojure-snippets "0.0.2"]
                  [org.clojure/data.xml "0.0.7"]]
   :plugins [[no-man-is-an-island/lein-eclipse "2.0.0"]
             [lein-marginalia "0.7.1"]]
