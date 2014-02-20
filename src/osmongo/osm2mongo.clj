@@ -118,7 +118,9 @@
          lat (:lat attrs)
          lon (:lon attrs)
          tags (apply merge-with concat (map treat-node (:content node)))
-         result (merge common {:geometry [lon lat] :tags tags})]
+         result (merge common {:geometry [(Double/parseDouble lon)
+                                          (Double/parseDouble lat)]
+                               :tags tags})]
      (m/insert! :nodes result))
   nil)
 
