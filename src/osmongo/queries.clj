@@ -1,6 +1,7 @@
 (ns osmongo.queries
   (:require [osmongo.db :as db]
-            [somnium.congomongo :as m]))
+            [somnium.congomongo :as m]
+            [clojure.data.json :as json]))
 
 (defn node->way [node]
   (contains?
@@ -31,4 +32,25 @@
               results-ways (filter node->way (map #(:_id (:obj %)) results))]
           (recur (* 10 dist) (first results-ways)))))))
 
-(coordinate->osmid 41.377873 2.152926 nil)
+(defn point->osmid [point]
+  (coordinate->osmid (second point) (first point) nil))
+
+(defmulti geometry->osmid :type)
+
+(defmethod geometry->osmid "Point" [geometry]
+  [(point->osmid (:coordinates geometry))])
+
+(defmethod geometry->osmid "LineString" [geometry]
+  (into [] (map point->osmid (:coordinates geometry))))
+
+(defmulti geoclj->osmid :type)
+
+(defmethod geoclj->osmid "FeatureCollection" [geoclj]
+  (assoc geoclj :features (into [] (map geoclj->osmid (:features geoclj)))))
+
+(defmethod geoclj->osmid "Feature" [geoclj]
+  (assoc-in geoclj [:properties :osm-ids] (geometry->osmid (:geometry geoclj))))
+
+(defn geojson->osmid [geojson]
+  (let [attached (geoclj->osmid (json/read-str geojson :key-fn keyword))]
+    (json/write-str attached)))
