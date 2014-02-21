@@ -1,4 +1,4 @@
-(defproject osmongo "0.1.0-SNAPSHOT"
+(defproject osmongo "0.1.0"
   :description ""
   :url "http://example.com/FIXME"
   :repositories [["bintray" "http://dl.bintray.com/tranchis/clojure-snippets"]]
