@@ -42,7 +42,7 @@
 
 (defmethod treat-node :tag [node]
   (let [attrs (:attrs node)
-        k (:k attrs)
+        k (clojure.string/replace (:k attrs) #"\." ">")
         v (:v attrs)]
     {(keyword k) [v]}))
 
