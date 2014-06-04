@@ -2,11 +2,13 @@
   :description ""
   :url "http://example.com/FIXME"
   :repositories [["bintray" "http://dl.bintray.com/tranchis/clojure-snippets"]]
-  :dependencies [[org.clojure/clojure "1.5.1"]
+  :dependencies [[org.clojure/clojure "1.6.0"]
                  [clj-time "0.6.0"]
                  [congomongo "0.4.1"]
                  [com.github.tranchis/clojure-snippets "0.0.2"]
                  [org.clojure/data.json "0.2.4"]
+                 [org.apache.commons/commons-compress "1.4"]
+                 [org.clojure/core.async "0.1.303.0-886421-alpha"]
                  [org.clojure/data.xml "0.0.7"]]
   :plugins [[no-man-is-an-island/lein-eclipse "2.0.0"]
             [lein-marginalia "0.7.1"]]

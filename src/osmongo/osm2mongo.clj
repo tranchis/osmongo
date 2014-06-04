@@ -1,7 +1,10 @@
 (ns osmongo.osm2mongo
   (:require [clojure.data.xml :as xml]
             [clojure.java.io :as io]
+            [clojure.core.async :as async :refer [chan <! >! go]]
             [somnium.congomongo :as m])
+  (:import (org.apache.commons.compress.compressors.bzip2
+             BZip2CompressorInputStream))
   (:gen-class))
 
 (defn to-long [st]
@@ -124,18 +127,58 @@
      (m/insert! :nodes result))
   nil)
 
+(defn copy! [uri file]
+  (with-open [in (io/input-stream uri)
+              out (io/output-stream file)]
+    (io/copy in out)))
+
+(defn bz2-reader
+  "Returns a streaming Reader for the given compressed BZip2
+  file. Use within (with-open)."
+  [filename]
+  (-> filename io/file io/input-stream BZip2CompressorInputStream. io/reader))
+
+(defn treat-root-node [elem ch]
+  (go
+    (>! ch (:tag elem)))
+  (treat-node elem))
+
 (defn osm-to-mongo
   "Usually there are four node types inside the OSM
    file: `#{:bounds :way :node :relation}`."
-  [file-name mongo-url]
+  [orig-city-name mongo-url]
   (m/set-connection! (m/make-connection mongo-url))
   (m/destroy! :nodes {})
   (m/destroy! :ways {})
   (m/destroy! :relations {})
-  (with-open [rdr (io/reader file-name)]
-    (let [contents (xml/parse rdr)
-          elems (:content contents)]
-      (dorun (map treat-node elems)))))
+  (let [city-name (clojure.string/lower-case orig-city-name)
+        temp-file (java.io.File/createTempFile (str "osm-" city-name)
+                                               ".osm.bz2")
+        url (str "http://osm-extracted-metros.s3.amazonaws.com/"
+                 city-name
+                 ".osm.bz2")
+        ch (chan)]
+    (println "Downloading from: " url)
+    (copy! url temp-file)
+    (go
+      (loop [value (<! ch)
+             counts {}]
+        (if (= :finished value)
+          (do
+            (println "\n\nFinished!")
+            nil)
+          (let [new-counts (merge-with + counts {value 1})]
+            (print (str "\r" new-counts))
+            (recur (<! ch) new-counts)))))
+    (with-open [rdr (bz2-reader temp-file)]
+      (println "Processing file...")
+      (let [contents (xml/parse rdr)
+            elems (:content contents)]
+        (dorun (map #(treat-root-node % ch) elems))
+        (go
+          (>! ch :finished))))))
 
 (defn -main [& args]
   (apply osm-to-mongo args))
+
+#_(-main "Batticaloa" "mongodb://localhost/batticaloa")
